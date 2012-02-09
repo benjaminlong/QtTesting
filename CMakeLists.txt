@@ -98,6 +98,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqMenuEventTranslator.h
   pqNativeFileDialogEventTranslator.h
   pqNativeFileDialogEventPlayer.h
+  pqPlayBackEventsDialog.h
   pqRecordEventsDialog.h
   pqSpinBoxEventTranslator.h
   pqStdoutEventObserver.h
@@ -113,7 +114,12 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
 
 QT4_WRAP_UI(UI_BUILT_SOURCES
+  pqPlayBackEventsDialog.ui
   pqRecordEventsDialog.ui
+)
+
+QT4_ADD_RESOURCES(QRC_BUILT_SOURCES
+  Resources/QtTestingIcons.qrc
 )
 
 SET(QtTesting_SOURCES
@@ -142,6 +148,7 @@ SET(QtTesting_SOURCES
   pqNativeFileDialogEventTranslator.cxx
   pqMenuEventTranslator.cxx
   pqObjectNaming.cxx
+  pqPlayBackEventsDialog.cxx
   pqRecordEventsDialog.cxx
   pqSpinBoxEventTranslator.cxx
   pqStdoutEventObserver.cxx
@@ -181,6 +188,7 @@ SET(QtTesting_DEVEL_HEADERS
   pqNativeFileDialogEventTranslator.h
   pqMenuEventTranslator.h
   pqObjectNaming.h
+  pqPlayBackEventsDialog.h
   pqRecordEventsDialog.h
   pqSpinBoxEventTranslator.h
   pqStdoutEventObserver.h
@@ -200,6 +208,7 @@ ADD_LIBRARY(QtTesting
   ${QtTesting_SOURCES}
   ${MOC_BUILT_SOURCES}
   ${UI_BUILT_SOURCES}
+  ${QRC_BUILT_SOURCES}
   ${PYTHON_SRCS}
 )
 

@@ -71,6 +71,12 @@ public:
     calling Qt version, since that will break test playback*/
   static void processEvents(QEventLoop::ProcessEventsFlags flags = QEventLoop::AllEvents);
 
+//  /// Method to be able to stop/pause/play the current playback script
+  void pause();
+  void restart();
+  void stop();
+  void oneStep();
+
 signals:
 
   /// signal when playback starts
@@ -91,10 +97,19 @@ protected slots:
   /// Called when the mainThread wakes up.
   void awake();
 
+public slots:
+  /// Change the TimeStep
+  void changeTimeStep(const int& value);
+
 protected:
+  bool PlayingBlockingEvent;
   bool PlayBackFinished;
+  bool PlayBackPaused;
   bool PlayBackStatus;
+  bool PlayBackOneStep;
+  bool PlayBackStoped;
   static bool DeferMenuTimeouts;
+  int TimeStep;
 
   pqEventSource* ActiveSource;
   pqEventPlayer* ActivePlayer;

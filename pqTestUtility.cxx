@@ -33,10 +33,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTestUtility.h"
 
 #include <QFileInfo>
+#include <QDebug>
 #include <QApplication>
 
 #include "pqEventSource.h"
 #include "pqEventObserver.h"
+#include "pqPlayBackEventsDialog.h"
 #include "pqRecordEventsDialog.h"
 #include "QtTestingConfigure.h"
 
@@ -120,6 +122,17 @@ void pqTestUtility::addEventObserver(const QString& fileExtension,
 
 }
 
+
+//-----------------------------------------------------------------------------
+void pqTestUtility::openPlayerDialog()
+{
+  pqPlayBackEventsDialog* dialog = new pqPlayBackEventsDialog(this->Player,
+                                                              this->Dispatcher,
+                                                              this,
+                                                              QApplication::activeWindow());
+  dialog->show();
+}
+
 //-----------------------------------------------------------------------------
 bool pqTestUtility::playTests(const QString& filename)
 {
@@ -136,6 +149,8 @@ bool pqTestUtility::playTests(const QStringList& filenames)
     qCritical("playTests() cannot be called recursively.");
     return false;
     }
+
+  emit this->started();
 
   this->PlayingTest = true;
 
@@ -159,6 +174,8 @@ bool pqTestUtility::playTests(const QStringList& filenames)
       }
     }
   this->PlayingTest = false;
+
+  emit this->stopped();
   return success;
 }
 

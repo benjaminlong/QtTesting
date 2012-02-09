@@ -107,6 +107,13 @@ public:
   /// give a filename convert from one of the data directories
   QString convertFromDataDirectory(const QString& file);
 
+public slots:
+    void openPlayerDialog();
+
+signals:
+    void started();
+    void stopped();
+
 protected:
   pqEventDispatcher Dispatcher;
   pqEventPlayer Player;

@@ -89,6 +89,7 @@ void pqEventPlayer::playEvent(
   const QString& Arguments,
   bool& Error)
 {
+  emit this->eventAboutToBePlayed(Object, Command, Arguments);
   // If we can't find an object with the right name, we're done ...
   QObject* const object = pqObjectNaming::GetObject(Object);
   if(!object)
