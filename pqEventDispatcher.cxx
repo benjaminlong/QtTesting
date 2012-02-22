@@ -53,13 +53,20 @@ pqEventDispatcher::pqEventDispatcher(QObject* parentObject) :
 {
   this->ActiveSource = NULL;
   this->ActivePlayer = NULL;
+
+  this->PlayingBlockingEvent = false;
+
   this->PlayBackStatus = false;
   this->PlayBackFinished = false;
+  this->PlayBackPaused = false;
+  this->PlayBackOneStep = false;
+  this->PlayBackStoped = false;
+  this->TimeStep = 1;
 
 #ifdef __APPLE__
   this->BlockTimer.setInterval(1000);
 #else
-  this->BlockTimer.setInterval(100);
+  this->BlockTimer.setInterval(0);
 #endif
   this->BlockTimer.setSingleShot(true);
   QObject::connect(&this->BlockTimer, SIGNAL(timeout()),
@@ -96,6 +103,46 @@ void pqEventDispatcher::awake()
 }
 
 //-----------------------------------------------------------------------------
+void pqEventDispatcher::changeTimeStep(const int& value)
+{
+  this->TimeStep = value;
+}
+
+//-----------------------------------------------------------------------------
+void pqEventDispatcher::pause()
+{
+  this->PlayBackPaused = true;
+  emit this->paused();
+}
+
+//-----------------------------------------------------------------------------
+void pqEventDispatcher::restart()
+{
+  this->PlayBackPaused = false;
+  emit this->started();
+}
+
+//-----------------------------------------------------------------------------
+void pqEventDispatcher::stop()
+{
+  this->PlayBackPaused = false;
+  this->PlayBackFinished = true;
+  emit this->stopped();
+}
+
+//-----------------------------------------------------------------------------
+bool pqEventDispatcher::isPaused()
+{
+  return this->PlayBackPaused;
+}
+
+//-----------------------------------------------------------------------------
+void pqEventDispatcher::oneStep()
+{
+  this->PlayBackOneStep = true;
+}
+
+//-----------------------------------------------------------------------------
 bool pqEventDispatcher::playEvents(pqEventSource& source, pqEventPlayer& player)
 {
   if (this->ActiveSource || this->ActivePlayer)
@@ -103,8 +150,6 @@ bool pqEventDispatcher::playEvents(pqEventSource& source, pqEventPlayer& player)
     qCritical() << "Event dispatcher is already playing";
     return false;
     }
-
-  emit this->started();
 
   this->ActiveSource = &source;
   this->ActivePlayer = &player;
@@ -116,6 +161,7 @@ bool pqEventDispatcher::playEvents(pqEventSource& source, pqEventPlayer& player)
   QObject::connect(QAbstractEventDispatcher::instance(), SIGNAL(awake()),
                    this, SLOT(awake()));
 
+  emit this->started();
 
   // This is how the playback logic works:
   // * In here, we continuously keep on playing one event after another until
@@ -132,7 +178,23 @@ bool pqEventDispatcher::playEvents(pqEventSource& source, pqEventPlayer& player)
   this->PlayBackFinished = false;
   while (!this->PlayBackFinished)
     {
-    this->playEvent();
+    qDebug() << "while Loop";
+    if(!this->PlayBackPaused)
+      {
+      this->playEvent();
+      }
+    else
+      {
+      if (this->PlayBackOneStep)
+        {
+        this->PlayBackOneStep = false;
+        this->playEvent();
+        }
+      else
+        {
+        this->processEventsAndWait(100);
+        }
+      }
     }
   this->ActiveSource = NULL;
   this->ActivePlayer = NULL;
@@ -142,28 +204,36 @@ bool pqEventDispatcher::playEvents(pqEventSource& source, pqEventPlayer& player)
   QObject::disconnect(QAbstractEventDispatcher::instance(), SIGNAL(awake()),
                    this, SLOT(awake()));
 
-  emit this->stopped();
-
+  qDebug() << "About to Stop Dispatcher";
   return this->PlayBackStatus;
 }
 
 //-----------------------------------------------------------------------------
 void pqEventDispatcher::playEventOnBlocking()
 {
+//  if(this->PlayingBlockingEvent)
+//    {
+//    qDebug() << "Event blocking already playing ....";
+//    return;
+//    }
+
   if (pqEventDispatcher::DeferMenuTimeouts)
     {
     this->BlockTimer.start();
     return;
     }
 
-  //cout << "---blocked event: " << endl;
-  // if needed for debugging, I can print blocking annotation here.
+//  this->PlayingBlockingEvent = true;
+
+  cout << "---blocked event: " << endl;
+// if needed for debugging, I can print blocking annotation here.
   this->playEvent(1);
 
   //if (!this->BlockTimer.isActive())
   //  {
   //  this->BlockTimer.start();
   //  }
+  this->PlayingBlockingEvent = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -229,7 +299,8 @@ void pqEventDispatcher::playEvent(int indent)
     cout << "       -- pre-processEventsAndWait: " << local_counter <<endl;
     }
   // let what's going to happen after the playback, happen.
-  this->processEventsAndWait(QT_TESTING_EVENT_PLAYBACK_DELAY);
+//  this->processEventsAndWait(QT_TESTING_EVENT_PLAYBACK_DELAY);
+  this->processEventsAndWait(this->TimeStep);
   if (print_debug)
     {
     cout << "       -- post-processEventsAndWait: " << local_counter <<endl;
@@ -242,12 +313,14 @@ void pqEventDispatcher::playEvent(int indent)
          << QString().fill(' ', 4*indent).toStdString().c_str()
          << local_counter << ": Done" << endl;
     }
+
   if (error)
     {
     this->PlayBackStatus  = false;
     this->PlayBackFinished = true;
     return;
     }
+
 }
 
 //-----------------------------------------------------------------------------
@@ -257,7 +330,7 @@ void pqEventDispatcher::processEventsAndWait(int ms)
   pqEventDispatcher::DeferMenuTimeouts = true;
   if (ms > 0)
     {
-    ms = (ms < 100) ? 100 : ms;
+//    ms = (ms < 100) ? 100 : ms;
     QApplication::processEvents();
     QEventLoop loop;
     QTimer::singleShot(ms, &loop, SLOT(quit()));

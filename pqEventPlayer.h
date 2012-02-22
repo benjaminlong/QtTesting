@@ -92,11 +92,18 @@ public:
   to "true".  Note: Currently there is no guarantee that playEvent()
   will return immediately, since the functionality it invokes may enter
   a separate event loop (a modal dialog or context menu, for example). */
-  void playEvent(
-    const QString& Object,
-    const QString& Command,
-    const QString& Arguments,
-    bool& Error);
+  void playEvent(const QString& Object,
+                 const QString& Command,
+                 const QString& Arguments,
+                 bool& Error);
+
+signals:
+  void eventAboutToBePlayed(const QString& Object,
+                            const QString& Command,
+                            const QString& Arguments);
+  void eventPlayed(const QString& Object,
+                   const QString& Command,
+                   const QString& Arguments);
 
 private:
   pqEventPlayer(const pqEventPlayer&);

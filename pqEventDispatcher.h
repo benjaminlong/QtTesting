@@ -71,10 +71,15 @@ public:
     calling Qt version, since that will break test playback*/
   static void processEvents(QEventLoop::ProcessEventsFlags flags = QEventLoop::AllEvents);
 
-signals:
+  /// Return if the Dispatcher is not playing events
+  bool isPaused();
 
+signals:
   /// signal when playback starts
   void started();
+
+  /// signal when playback pauses
+  void paused();
 
   /// signal when playback stops
   void stopped();
@@ -91,10 +96,24 @@ protected slots:
   /// Called when the mainThread wakes up.
   void awake();
 
+public slots:
+  /// Change the TimeStep
+  void changeTimeStep(const int& value);
+  /// Method to be able to stop/pause/play the current playback script
+  void pause();
+  void restart();
+  void stop();
+  void oneStep();
+
 protected:
+  bool PlayingBlockingEvent;
   bool PlayBackFinished;
+  bool PlayBackPaused;
   bool PlayBackStatus;
+  bool PlayBackOneStep;
+  bool PlayBackStoped;
   static bool DeferMenuTimeouts;
+  int TimeStep;
 
   pqEventSource* ActiveSource;
   pqEventPlayer* ActivePlayer;
