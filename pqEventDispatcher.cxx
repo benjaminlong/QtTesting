@@ -181,7 +181,7 @@ bool pqEventDispatcher::playEvents(pqEventSource& source, pqEventPlayer& player)
   this->PlayBackFinished = false;
   while (!this->PlayBackFinished)
     {
-    qDebug() << "while Loop";
+//    qDebug() << "while Loop";
     if(!this->PlayBackPaused)
       {
       this->playEvent();
