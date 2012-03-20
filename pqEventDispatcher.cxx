@@ -109,17 +109,18 @@ void pqEventDispatcher::setTimeStep(int value)
 }
 
 //-----------------------------------------------------------------------------
-void pqEventDispatcher::pause()
+void pqEventDispatcher::run(bool value)
 {
-  this->PlayBackPaused = true;
-  emit this->paused();
-}
-
-//-----------------------------------------------------------------------------
-void pqEventDispatcher::restart()
-{
-  this->PlayBackPaused = false;
-  emit this->restarted();
+  qDebug() << "Dispatcher" << value;
+  this->PlayBackPaused = !value;
+  if (value)
+    {
+    emit this->restarted();
+    }
+  else
+    {
+    emit this->paused();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -181,7 +182,6 @@ bool pqEventDispatcher::playEvents(pqEventSource& source, pqEventPlayer& player)
   this->PlayBackFinished = false;
   while (!this->PlayBackFinished)
     {
-//    qDebug() << "while Loop";
     if(!this->PlayBackPaused)
       {
       this->playEvent();

@@ -100,8 +100,7 @@ public slots:
   /// Change the TimeStep
   void setTimeStep(int value);
   /// Method to be able to stop/pause/play the current playback script
-  void pause();
-  void restart();
+  void run(bool value);
   void stop();
   void oneStep();
 
