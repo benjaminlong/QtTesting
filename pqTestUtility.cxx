@@ -148,7 +148,14 @@ bool pqTestUtility::playTests(const QStringList& filenames)
     iter = this->EventSources.find(suffix);
     if(info.isReadable() && iter != this->EventSources.end())
       {
-      iter.value()->setContent(filename);
+      if(!iter.value()->setContent(filename))
+        {
+        return false;
+        }
+//      QEventLoop loop;
+//      QTimer::singleShot(100, &loop, SLOT(quit()));
+//      loop.exec();
+      QApplication::processEvents();
       if (!this->Dispatcher.playEvents(*iter.value(), this->Player))
         {
         // dispatcher returned failure, don't continue with rest of the tests
@@ -202,6 +209,17 @@ void pqTestUtility::recordTests(const QString& filename)
   dialog->show();
 }
 
+// ----------------------------------------------------------------------------
+void pqTestUtility::addObjectStateProperty(QObject* object, const QString& property)
+{
+  this->ObjectStateProperty[object] = property;
+}
+
+// ----------------------------------------------------------------------------
+QMap<QObject*, QString> pqTestUtility::objectStateProperty() const
+{
+  return this->ObjectStateProperty;
+}
 //-----------------------------------------------------------------------------
 void pqTestUtility::addDataDirectory(const QString& label, const QDir& path)
 {
