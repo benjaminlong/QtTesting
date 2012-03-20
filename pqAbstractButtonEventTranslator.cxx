@@ -105,6 +105,10 @@ void pqAbstractButtonEventTranslator::onActivate(QAbstractButton* actualObject)
     const bool new_value = !actualObject->isChecked();
     emit recordEvent(object, "set_boolean", new_value ? "true" : "false");
     }
+  else if(tb && tb->actions().count() < 2)
+    {
+    emit recordEvent(tb, "activate", "");
+    }
   else
     {
     emit recordEvent(object, "activate", "");
