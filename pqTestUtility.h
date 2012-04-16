@@ -49,8 +49,7 @@ class pqEventObserver;
 class pqEventSource;
 
 /// Organizes basic functionality for regression testing
-class QTTESTING_EXPORT pqTestUtility :
-  public QObject
+class QTTESTING_EXPORT pqTestUtility : public QObject
 {
   Q_OBJECT
 
@@ -91,29 +90,26 @@ public:
   /// failure. Returns true if the test played successfully.
   bool playTests(const QString& filename);
   virtual bool playTests(const QStringList& filenames);
-
   /// start the recording of tests to a file
-  void recordTests(const QString& filename);
+  Q_INVOKABLE void recordTests(const QString& filename);
 
   /// add a directory for recording/playback of file dialogs
   void addDataDirectory(const QString& label, const QDir& path);
-
   /// remove a directory for recording/playback of file dialogs
   void removeDataDirectory(const QString& label);
 
   /// given filename convert to one of the data directories
   QString convertToDataDirectory(const QString& file);
-
   /// give a filename convert from one of the data directories
   QString convertFromDataDirectory(const QString& file);
 
 protected:
-  pqEventDispatcher Dispatcher;
-  pqEventPlayer Player;
-  pqEventTranslator Translator;
-  bool PlayingTest;
+  pqEventDispatcher   Dispatcher;
+  pqEventPlayer       Player;
+  pqEventTranslator   Translator;
+  bool                PlayingTest;
 
-  QMap<QString, pqEventSource*> EventSources;
+  QMap<QString, pqEventSource*>   EventSources;
   QMap<QString, pqEventObserver*> EventObservers;
 
   QMap<QString, QDir> DataDirectories;
