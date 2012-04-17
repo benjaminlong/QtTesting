@@ -90,6 +90,14 @@ void pqEventPlayer::addWidgetEventPlayer(pqWidgetEventPlayer* Player)
 {
   if(Player)
     {
+    // We Check if the Player has already been added previously
+    int index =
+      this->getWidgetEventPlayerIndex(QString(Player->metaObject()->className()));
+    if (index != -1)
+      {
+      return;
+      }
+
     this->Players.push_front(Player);
     Player->setParent(this);
     }

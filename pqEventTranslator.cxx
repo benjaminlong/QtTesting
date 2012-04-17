@@ -125,6 +125,14 @@ void pqEventTranslator::addWidgetEventTranslator(pqWidgetEventTranslator* Transl
 {
   if(Translator)
     {
+    // We Check if the translator has already been added previously.
+    int index =
+      this->getWidgetEventTranslatorIndex(Translator->metaObject()->className());
+    if (index != -1)
+      {
+      return;
+      }
+
     this->Implementation->Translators.push_front(Translator);
     Translator->setParent(this);
     

@@ -255,7 +255,7 @@ INSTALL(TARGETS QtTesting
 
 add_subdirectory(Examples)
 
-OPTION(BUILD_TESTING "Enable/Disable Testing" ON)
+include(CTest)
 IF(BUILD_TESTING)
   add_subdirectory(Testing)
 ENDIF()

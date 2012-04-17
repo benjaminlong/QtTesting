@@ -1,3 +1,5 @@
+include(../CMake/qtTestingMacroGenerateMocs.cmake)
+
 set(KIT ${PROJECT_NAME})
 
 set(TEST_SOURCES
