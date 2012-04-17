@@ -62,7 +62,7 @@ struct pqEventTranslator::pqImplementation
   }
 
   /// Stores the working set of widget translators  
-  QVector<pqWidgetEventTranslator*> Translators;
+  QList<pqWidgetEventTranslator*> Translators;
   /// Stores the set of objects that should be ignored when translating events
   QSet<QObject*> IgnoredObjects;
 
@@ -117,7 +117,7 @@ void pqEventTranslator::addDefaultWidgetEventTranslators(pqTestUtility* util)
   addWidgetEventTranslator(new pqTabBarEventTranslator());
   addWidgetEventTranslator(new pqTreeViewEventTranslator());
   addWidgetEventTranslator(new pq3DViewEventTranslator("QGLWidget"));
-  //addWidgetEventTranslator(new pqNativeFileDialogEventTranslator(util));
+  addWidgetEventTranslator(new pqNativeFileDialogEventTranslator(util));
 }
 
 // ----------------------------------------------------------------------------
@@ -145,7 +145,7 @@ bool pqEventTranslator::removeWidgetEventTranslator(const QString& className)
     return false;
     }
 
-  this->Implementation->Translators.remove(index);
+  this->Implementation->Translators.removeAt(index);
   return true;
 }
 
@@ -174,6 +174,12 @@ int pqEventTranslator::getWidgetEventTranslatorIndex(const QString& className)
       }
     }
   return -1;
+}
+
+// ----------------------------------------------------------------------------
+QList<pqWidgetEventTranslator*> pqEventTranslator::translators() const
+{
+  return this->Implementation->Translators;
 }
 
 // ----------------------------------------------------------------------------
