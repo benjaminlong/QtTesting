@@ -5,6 +5,7 @@ set(KIT ${PROJECT_NAME})
 set(TEST_SOURCES
   pqEventPlayerTest.cpp
   pqEventTranslatorTest.cpp
+  pqTestUtilityTest.cpp
   )
 
 create_test_sourcelist(Tests ${KIT}CppTests.cxx
@@ -33,3 +34,4 @@ endmacro()
 #
 SIMPLE_TEST( pqEventPlayerTest )
 SIMPLE_TEST( pqEventTranslatorTest )
+SIMPLE_TEST( pqTestUtilityTest )
