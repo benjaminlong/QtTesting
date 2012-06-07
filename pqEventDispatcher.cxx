@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqEventDispatcher.h"
 
+#include "pqCommentEventPlayer.h"
 #include "pqEventPlayer.h"
 #include "pqEventSource.h"
 
@@ -242,6 +243,7 @@ bool pqEventDispatcher::playEvents(pqEventSource& source, pqEventPlayer& player)
         }
       }
     }
+
   this->ActiveSource = NULL;
   this->ActivePlayer = NULL;
 

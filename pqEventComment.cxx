@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqNativeFileDialogEventPlayer.h
+   Module:    pqEventComment.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,49 +30,54 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#include "pqCommentEventPlayer.h"
+// Qt includes
+#include <QDebug>
+
+// QtTesting includes
+#include "pqEventComment.h"
 
 // ----------------------------------------------------------------------------
-pqCommentEventPlayer::pqCommentEventPlayer(pqTestUtility* testUtility,
-                                           QObject* parent)
-  : pqWidgetEventPlayer(parent)
+pqEventComment::pqEventComment(pqTestUtility* util,
+                               QObject* parent)
+  : Superclass(parent)
 {
-  this->TestUtility = testUtility;
+  this->TestUtility = util;
 }
 
 // ----------------------------------------------------------------------------
-pqCommentEventPlayer::~pqCommentEventPlayer()
+pqEventComment::~pqEventComment()
 {
   this->TestUtility = 0;
 }
 
 // ----------------------------------------------------------------------------
-bool pqCommentEventPlayer::playEvent(QObject* Object,
-                                     const QString &Command,
-                                     const QString &Arguments,
-                                     bool &Error)
+void pqEventComment::recordComment(const QString& arguments, QObject* object)
 {
-  if (Command != "comment-log" &&
-      Command != "comment-log-block" &&
-      Command != "comment-question")
+  this->recordComment(QString("comment-log"), arguments, object);
+}
+
+// ----------------------------------------------------------------------------
+void pqEventComment::recordCommentBlock(const QString& arguments, QObject* object)
+{
+  this->recordComment(QString("comment-log-block"), arguments, object);
+}
+
+// ----------------------------------------------------------------------------
+void pqEventComment::recordCommentQuestion(const QString& arguments, QObject* object)
+{
+  this->recordComment(QString("comment-question"), arguments, object);
+}
+
+// ----------------------------------------------------------------------------
+void pqEventComment::recordComment(const QString& command,
+                                   const QString& arguments,
+                                   QObject* object)
+{
+  if (arguments.isEmpty())
     {
-    return false;
+    qCritical() << "Your comment is empty ! No comment has been added !";
+    return;
     }
 
-  if (Command.split("-").contains("log"))
-    {
-    emit this->comment(Arguments);
-    }
-
-  if (Command.split("-").contains("block"))
-    {
-    this->TestUtility->dispatcher()->run(false);
-    }
-
-  if (Command.split("-").contains("question"))
-    {
-    // to be implemented
-    }
-
-  return true;
+  emit this->recordComment(object, command, arguments);
 }
