@@ -77,6 +77,7 @@ public:
   int           CurrentFile;
   QStringList   Filenames;
   QStringList   CurrentEvent;
+  QRect         OldRect;
 };
 
 // ----------------------------------------------------------------------------
@@ -160,6 +161,10 @@ void pqPlayBackEventsDialog::pqImplementation::init(pqPlayBackEventsDialog* dial
   QObject::connect(&this->Dispatcher, SIGNAL(restarted()),
                    dialog, SLOT(updateUi()));
 
+  this->Ui.modalCheckBox->setChecked(true);
+  QObject::connect(this->Ui.modalCheckBox, SIGNAL(toggled(bool)),
+                   dialog, SLOT(onModal(bool)));
+
   QObject::connect(&this->Player, SIGNAL(errorMessage(QString)),
                    this->Ui.logBrowser, SLOT(append(QString)));
 
@@ -219,6 +224,7 @@ pqPlayBackEventsDialog::~pqPlayBackEventsDialog()
 // ----------------------------------------------------------------------------
 void pqPlayBackEventsDialog::done(int value)
 {
+  qDebug() << "DONE";
   this->Implementation->TestUtility->stopTests();
   QDialog::done(value);
 }
@@ -467,4 +473,57 @@ void pqPlayBackEventsDialog::updateUi()
   this->Implementation->Ui.objectLabel->setText(object);
 
   this->update();
+}
+
+void pqPlayBackEventsDialog::onModal(bool value)
+{
+  qDebug() << "modal : " << value;
+  this->setModal(value);
+
+  // From modal to modeless we don't need to hide() show() the dialog
+  if (value)
+    {
+    qDebug() << "**************** HIDE";
+    this->hide();
+//    this->setVisible(false);
+    qDebug() << "**************** SHOW";
+    this->setGeometry(this->Implementation->OldRect);
+//    this->setVisible(true);
+    this->show();
+//    this->raise();
+//    this->activateWindow();
+//    this->open();
+    }
+  qDebug() << this->isVisible();
+}
+
+#include <QShowEvent>
+
+void pqPlayBackEventsDialog::showEvent(QShowEvent* event)
+{
+  qDebug() << "senders show event" << this->sender() << event->spontaneous();
+  qDebug() << "show event before, geo = " << this->geometry() << this->isVisible();
+  if (event->spontaneous())
+    {
+    this->setGeometry(this->Implementation->OldRect);
+    }
+  qDebug() << "show event after, geo = " << this->geometry() << this->isVisible();
+  this->Superclass::showEvent(event);
+}
+
+#include <QHideEvent>
+
+void pqPlayBackEventsDialog::hideEvent(QHideEvent* event)
+{
+  qDebug() << "senders hide event" << this->sender() << event->spontaneous();
+  qDebug() << "hideEvent geo = " << this->geometry() << this->isVisible();
+  this->Implementation->OldRect = this->geometry();
+  this->Superclass::hideEvent(event);
+}
+
+void pqPlayBackEventsDialog::closeEvent(QCloseEvent* event)
+{
+  qDebug() << "close event";
+  this->Implementation->OldRect = this->geometry();
+  this->Superclass::closeEvent(event);
 }

@@ -176,7 +176,8 @@ void pqTestUtility::openPlayerDialog()
                                 this->Dispatcher,
                                 this,
                                 QApplication::activeWindow());
-  dialog->exec();
+  dialog->setModal(true);
+  dialog->show();
 }
 
 //-----------------------------------------------------------------------------

@@ -681,6 +681,13 @@
       </spacer>
      </item>
      <item>
+      <widget class="QCheckBox" name="modalCheckBox">
+       <property name="text">
+        <string>modal</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QLabel" name="timeStepLabel">
        <property name="text">
         <string>Time step :</string>
