@@ -122,7 +122,6 @@ void pqPlayBackEventsDialog::pqImplementation::init(pqPlayBackEventsDialog* dial
     {
     QObject::connect(commentPlayer, SIGNAL(comment(QString)),
                      this->Ui.logBrowser, SLOT(append(QString)));
-    qDebug() << "Comment player : " << commentPlayer;
     }
 
   dialog->setMaximumHeight(dialog->minimumSizeHint().height());
@@ -161,7 +160,7 @@ void pqPlayBackEventsDialog::pqImplementation::init(pqPlayBackEventsDialog* dial
   QObject::connect(&this->Dispatcher, SIGNAL(restarted()),
                    dialog, SLOT(updateUi()));
 
-  this->Ui.modalCheckBox->setChecked(true);
+  this->Ui.modalCheckBox->setChecked(false);
   QObject::connect(this->Ui.modalCheckBox, SIGNAL(toggled(bool)),
                    dialog, SLOT(onModal(bool)));
 
@@ -224,7 +223,6 @@ pqPlayBackEventsDialog::~pqPlayBackEventsDialog()
 // ----------------------------------------------------------------------------
 void pqPlayBackEventsDialog::done(int value)
 {
-  qDebug() << "DONE";
   this->Implementation->TestUtility->stopTests();
   QDialog::done(value);
 }
@@ -410,6 +408,11 @@ void pqPlayBackEventsDialog::onStopped()
 // ----------------------------------------------------------------------------
 void pqPlayBackEventsDialog::updateUi()
 {
+  // Update Moda/Modeless
+  this->onModal(this->Implementation->TestUtility->playingTest() &&
+                !(this->Implementation->TestUtility->playingTest() &&
+                  this->Implementation->Dispatcher.isPaused()));
+
   // Update player buttons
   this->Implementation->Ui.playPauseButton->setChecked(
       this->Implementation->TestUtility->playingTest() &&
@@ -477,53 +480,35 @@ void pqPlayBackEventsDialog::updateUi()
 
 void pqPlayBackEventsDialog::onModal(bool value)
 {
-  qDebug() << "modal : " << value;
-  this->setModal(value);
-
   // From modal to modeless we don't need to hide() show() the dialog
   if (value)
     {
-    qDebug() << "**************** HIDE";
-    this->hide();
-//    this->setVisible(false);
-    qDebug() << "**************** SHOW";
-    this->setGeometry(this->Implementation->OldRect);
-//    this->setVisible(true);
-    this->show();
-//    this->raise();
-//    this->activateWindow();
-//    this->open();
+    this->setAttribute(Qt::WA_WState_Visible, false);
+    this->setAttribute(Qt::WA_WState_Hidden, true);
     }
-  qDebug() << this->isVisible();
-}
-
-#include <QShowEvent>
-
-void pqPlayBackEventsDialog::showEvent(QShowEvent* event)
-{
-  qDebug() << "senders show event" << this->sender() << event->spontaneous();
-  qDebug() << "show event before, geo = " << this->geometry() << this->isVisible();
-  if (event->spontaneous())
+  this->setModal(value);
+  if (value)
     {
-    this->setGeometry(this->Implementation->OldRect);
+    this->Implementation->OldRect = this->frameGeometry();
+    this->setVisible(true);
+    this->Implementation->OldRect = QRect();
     }
-  qDebug() << "show event after, geo = " << this->geometry() << this->isVisible();
-  this->Superclass::showEvent(event);
+  this->raise();
 }
 
-#include <QHideEvent>
+#include <QMoveEvent>
 
-void pqPlayBackEventsDialog::hideEvent(QHideEvent* event)
+void pqPlayBackEventsDialog::moveEvent(QMoveEvent* event)
 {
-  qDebug() << "senders hide event" << this->sender() << event->spontaneous();
-  qDebug() << "hideEvent geo = " << this->geometry() << this->isVisible();
-  this->Implementation->OldRect = this->geometry();
-  this->Superclass::hideEvent(event);
+  if(this->Implementation->OldRect.isValid())
+    {
+    QPoint oldPos = this->Implementation->OldRect.topLeft();
+    this->Implementation->OldRect = QRect();
+    this->move(oldPos);
+    }
+  else
+    {
+    this->Superclass::moveEvent(event);
+    }
 }
 
-void pqPlayBackEventsDialog::closeEvent(QCloseEvent* event)
-{
-  qDebug() << "close event";
-  this->Implementation->OldRect = this->geometry();
-  this->Superclass::closeEvent(event);
-}

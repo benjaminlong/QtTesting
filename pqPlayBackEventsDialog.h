@@ -71,9 +71,7 @@ public slots:
   void updateUi();
 
 protected:
-  virtual void showEvent(QShowEvent* event);
-  virtual void hideEvent(QHideEvent* event);
-  virtual void closeEvent(QCloseEvent* event);
+  virtual void moveEvent(QMoveEvent* event);
 
 private:
   void loadFiles(const QStringList& filenames);
