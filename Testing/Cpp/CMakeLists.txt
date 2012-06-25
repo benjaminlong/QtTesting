@@ -8,6 +8,7 @@ set(TEST_SOURCES
   pqEventTranslatorTest.cpp
   pqDoubleSpinBoxEventPlayerTest.cpp
   pqDoubleSpinBoxEventTranslatorTest.cpp
+  pqLineEditEventTranslatorTest.cpp
   pqSpinBoxEventPlayerTest.cpp
   pqSpinBoxEventTranslatorTest.cpp
   pqTestUtilityTest.cpp
@@ -46,6 +47,7 @@ SIMPLE_TEST( pqEventPlayerTest )
 SIMPLE_TEST( pqEventRecorderTest )
 SIMPLE_TEST( pqDoubleSpinBoxEventPlayerTest )
 SIMPLE_TEST( pqDoubleSpinBoxEventTranslatorTest )
+SIMPLE_TEST( pqLineEditEventTranslatorTest )
 SIMPLE_TEST( pqSpinBoxEventPlayerTest )
 SIMPLE_TEST( pqSpinBoxEventTranslatorTest )
 SIMPLE_TEST( pqEventTranslatorTest )

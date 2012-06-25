@@ -66,6 +66,7 @@ bool pqLineEditEventTranslator::translateEvent(QObject* Object, QEvent* Event, b
     case QEvent::KeyRelease:
       {
       QKeyEvent* ke = static_cast<QKeyEvent*>(Event);
+      qDebug() << "key : " << ke->key() << "text : " << ke->text();
       QString keyText = ke->text();
       if(keyText.length() && keyText.at(0).isLetterOrNumber())
         {
